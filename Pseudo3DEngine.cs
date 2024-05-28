@@ -20,6 +20,8 @@ class Pseudo3DEngine : IEngine
         Vector2 rayDirection = new Vector2(Cos(rayAngle), Sin(rayAngle));
         rayDirection *= RayLength;
 
+        Segment ray = new Segment(_position, _position + rayDirection);
+
         // TODO
     }
 
