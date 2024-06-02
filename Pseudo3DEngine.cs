@@ -17,14 +17,16 @@ class Pseudo3DEngine : IEngine
         rayAngle -= ViewAngle / 2; // Shifts back for a half of ViewAngle to make camera's turn at the middle of camera view
         rayAngle *= Math.PI / 180; // Converts to radians
 
-        Vector2 rayDirection = new Vector2(Math.Cos(rayAngle), Math.Sin(rayAngle)); // Converts to vector
+        Vector2 rayDirection = new Vector2((float)Math.Cos(rayAngle), (float)Math.Sin(rayAngle)); // Converts to vector
         rayDirection *= RayLength; // Sets length of ray
 
         Segment ray = new Segment(_position, _position + rayDirection); // Converts to segment
 
         Segment wall = new Segment(-2, 5, 2, 5); // Test wall
 
-        
+        float? distance = (ray.IntersectsWith(wall) - _position)?.Length();
+
+        // TODO
     }
 
     public bool UpdateFrame(int width, int height)

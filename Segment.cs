@@ -39,10 +39,10 @@ class Segment
 
             float expr = (NonVertical.Point2.Y - NonVertical.Point1.Y) / (NonVertical.Point2.X - NonVertical.Point1.X);
             
-            float crossX = Vertical.Point1.X;
-            float crossY = NonVertical.Point1.Y + crossX * expr - NonVertical.Point1.X * expr;
+            float crossX_ = Vertical.Point1.X;
+            float crossY_ = NonVertical.Point1.Y + crossX_ * expr - NonVertical.Point1.X * expr;
 
-            return new Vector2(crossX, crossY);
+            return new Vector2(crossX_, crossY_);
         }
 
         // Danger: complicated math area
@@ -52,11 +52,11 @@ class Segment
         float b1x = this.Point2.X;
         float b1y = this.Point2.Y;
 
-        float a1x = segment.Point1.X;
-        float a1y = segment.Point1.Y;
+        float a2x = segment.Point1.X;
+        float a2y = segment.Point1.Y;
 
-        float b1x = segment.Point2.X;
-        float b1y = segment.Point2.Y;
+        float b2x = segment.Point2.X;
+        float b2y = segment.Point2.Y;
 
         float e1 = (b1y - a1y) / (b1x - a1x);
         float e2 = (b2y - a2y) / (b2x - a2x);
