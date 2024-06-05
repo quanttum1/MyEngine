@@ -1,16 +1,31 @@
 using System.Numerics;
 using System;
+using SFML.Window;
+using SFML.Graphics;
+using SFML.System;
 
 namespace MyEngine;
 
 class Pseudo3DEngine : IEngine
 {
-    private Vector2 _position = new Vector2(0, 0); // Camera position
-    private float _turnAngle = 0; // Camera's turn angle in degrees
-    private const float ViewAngle = 90; // Specifies how "many degrees" you can see
-    private const float RayLength = 100; // Specifies how far you can see
+    public Pseudo3DEngine(RenderWindow window)
+    {
+        _window = window;
+        // TODO: Add key event to move and rotate
+    }
 
-    private void RayCast(int x, int width)
+    public bool UpdateFrame()
+    {
+        int width = (int)_window.Size.X;
+        int height = (int)_window.Size.Y;
+
+        for (int i = 0; i < width; i++) { // Goes trough all "colums" of the window
+            RayCast(i, width, height);
+        }
+        return true;
+    }
+
+    private void RayCast(int x, int width, int height)
     {
         double rayAngle = _turnAngle; // Raw camera's turn angle 
         rayAngle += ViewAngle * x / width; // Shifts the angle specificly for this ray
@@ -26,14 +41,20 @@ class Pseudo3DEngine : IEngine
 
         float? distance = (ray.IntersectsWith(wall) - _position)?.Length();
 
-        // TODO
+        if (distance == null || distance == 0.0) return;
+
+        float lineSize = height / (float)distance;
+        
+        var line = new RectangleShape();
+        line.Position = new Vector2f((float)x, height / 2 - lineSize / 2);
+        line.FillColor = Color.White;
+        line.Size = new Vector2f(1, lineSize);
+        _window.Draw(line);
     }
 
-    public bool UpdateFrame(int width, int height)
-    {
-        for (int i = 0; i < width; i++) { // Goes trough all "colums" of the window
-            RayCast(i, width); 
-        }
-        return true;
-    }
+    private Vector2 _position = new Vector2(0, 0); // Camera position
+    private float _turnAngle = 90; // Camera's turn angle in degrees
+    private const float ViewAngle = 90; // Specifies how "many degrees" you can see
+    private const float RayLength = 100; // Specifies how far you can see
+    private RenderWindow _window;
 }

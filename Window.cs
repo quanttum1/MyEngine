@@ -6,7 +6,6 @@ namespace MyEngine;
 
 public class Window
 {
-    // TODO: Add window resize handler
     private const string Title = "My Engine";
     private RenderWindow _window;
     private Vector2 _resolution;
@@ -26,14 +25,14 @@ public class Window
 
     public void Run() {
         _window.KeyPressed += KeyPressedHandler;
-        IEngine engine = new Pseudo3DEngine();
+        IEngine engine = new Pseudo3DEngine(_window);
 
         while (_window.IsOpen)
         {
             _window.DispatchEvents();
             _window.Clear(Color.Black);
 
-            if (!engine.UpdateFrame((int)_resolution.X, (int)_resolution.Y))
+            if (!engine.UpdateFrame())
             {
                 _window.Close();
             }
