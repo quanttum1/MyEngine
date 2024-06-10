@@ -2,6 +2,7 @@ using System.Numerics;
 
 using SFML.Graphics;
 using SFML.System;
+using SFML.Window;
 
 namespace MyEngine;
 
@@ -10,7 +11,30 @@ public class Minimap : IEngine
     public Minimap(RenderTarget target, RenderWindow window)
     {
         _target = target;
-        // TODO: controls
+        
+        window.KeyPressed += (object? sender, KeyEventArgs e) => {
+            switch (e.Code)
+            {
+                case Keyboard.Key.K:
+                    _turnAngle -= 10;
+                    break;
+                case Keyboard.Key.L:
+                    _turnAngle += 10;
+                    break;
+                case Keyboard.Key.W:
+                    _position.Y -= 10;
+                    break;
+                case Keyboard.Key.S:
+                    _position.Y += 10;
+                    break;
+                case Keyboard.Key.A:
+                    _position.X -= 10;
+                    break;
+                case Keyboard.Key.D:
+                    _position.X += 10;
+                    break;
+            };
+        };
     }
 
     public bool UpdateFrame()
@@ -36,9 +60,8 @@ public class Minimap : IEngine
         Segment ray = new Segment(_position, _position + rayDirection); // Converts to segment
         Segment wall = new Segment(-50, 125, 500, 125); // Test wall
 
-        float? distance = (ray.IntersectsWith(wall) - _position)?.Length();
-
-        if (distance == null || distance == 0.0) return;
+        Vector2? point = ray.IntersectsWith(wall);
+        if (point != null) DrawPoint(point.Value);
 
         DrawSegment(wall);
 
@@ -51,6 +74,13 @@ public class Minimap : IEngine
         line[0] = new Vertex(new Vector2f(segment.Point1.X + 500, segment.Point1.Y + 500), Color.White);
         line[1] = new Vertex(new Vector2f(segment.Point2.X + 500, segment.Point2.Y + 500), Color.White);
         _target.Draw(line);
+    }
+
+    private void DrawPoint(Vector2 point)
+    {
+        CircleShape circle = new CircleShape(4, 4);
+        circle.Position = new Vector2f(point.X + 496, point.Y + 496);
+        _target.Draw(circle);
     }
 
     private Vector2 _position = new Vector2(0, 0); // Camera position

@@ -11,7 +11,30 @@ class Pseudo3DEngine : IEngine
     public Pseudo3DEngine(RenderTarget target, RenderWindow window) // window is given to add events
     {
         _target = target;
-        // TODO: Add key event to move and rotate
+        
+        window.KeyPressed += (object? sender, KeyEventArgs e) => {
+            switch (e.Code)
+            {
+                case Keyboard.Key.K:
+                    _turnAngle -= 1;
+                    break;
+                case Keyboard.Key.L:
+                    _turnAngle += 1;
+                    break;
+                case Keyboard.Key.W:
+                    _position += _angleToVector((float)(_turnAngle * (Math.PI / 180)));
+                    break;
+                case Keyboard.Key.S:
+                    _position -= _angleToVector((float)(_turnAngle * (Math.PI / 180)));
+                    break;
+                case Keyboard.Key.A:
+                    _turnAngle -= 5;
+                    break;
+                case Keyboard.Key.D:
+                    _turnAngle += 5;
+                    break;
+            };
+        };
     }
 
     public bool UpdateFrame()
@@ -32,7 +55,7 @@ class Pseudo3DEngine : IEngine
         rayAngle -= ViewAngle / 2; // Shifts back for a half of ViewAngle to make camera's turn at the middle of camera view
         rayAngle *= Math.PI / 180; // Converts to radians
 
-        Vector2 rayDirection = new Vector2((float)Math.Cos(rayAngle), (float)Math.Sin(rayAngle)); // Converts to vector
+        Vector2 rayDirection = _angleToVector((float)rayAngle);
         rayDirection *= RayLength; // Sets length of ray
 
         Segment ray = new Segment(_position, _position + rayDirection); // Converts to segment
@@ -50,6 +73,10 @@ class Pseudo3DEngine : IEngine
         line.FillColor = Color.White;
         line.Size = new Vector2f(1, lineSize);
         _target.Draw(line);
+    }
+
+    private Vector2 _angleToVector(float angle) {
+        return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
     }
 
     private Vector2 _position = new Vector2(0, 0); // Camera position

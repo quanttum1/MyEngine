@@ -1,6 +1,8 @@
 using System.Numerics;
 using System;
 
+using SFML.System;
+
 namespace MyEngine;
 
 class Segment
@@ -27,6 +29,7 @@ class Segment
 
     public Vector2? IntersectsWith(Segment segment) // Returns the point where two segments cross or null if they don't or if they are equal
     {
+        double crossX = 0, crossY = 0;
         // If one of the segments is vertical, have to use other method, otherwise will be dividion by zero
         if (Point1.X == Point2.X || segment.Point1.X == segment.Point2.X) 
         {
@@ -37,35 +40,55 @@ class Segment
             Segment NonVertical = segment1vert ? this : segment;
             Segment Vertical = segment2vert ? this : segment;
 
-            float expr = (NonVertical.Point2.Y - NonVertical.Point1.Y) / (NonVertical.Point2.X - NonVertical.Point1.X);
+            double expr = (NonVertical.Point2.Y - NonVertical.Point1.Y) / (NonVertical.Point2.X - NonVertical.Point1.X);
             
-            float crossX_ = Vertical.Point1.X;
-            float crossY_ = NonVertical.Point1.Y + crossX_ * expr - NonVertical.Point1.X * expr;
+            crossX = Vertical.Point1.X;
+            crossY = NonVertical.Point1.Y + crossX * expr - NonVertical.Point1.X * expr;
+        } else {
+            double a1x = this.Point1.X;
+            double a1y = this.Point1.Y;
 
-            return new Vector2(crossX_, crossY_);
+            double b1x = this.Point2.X;
+            double b1y = this.Point2.Y;
+
+            double a2x = segment.Point1.X;
+            double a2y = segment.Point1.Y;
+
+            double b2x = segment.Point2.X;
+            double b2y = segment.Point2.Y;
+
+            double e1 = (b1y - a1y) / (b1x - a1x);
+            double e2 = (b2y - a2y) / (b2x - a2x);
+
+            if (e2 - e1 == 0) return null; 
+
+            crossY = (a1y * e2 - a2y * e1 + a2x * e2 * e1 - a1x * e1 * e2) / (e2 - e1);
+            crossX = -((a1y - a1x * e1 - crossY) / e1);
         }
 
-        // Danger: complicated math area
-        float a1x = this.Point1.X;
-        float a1y = this.Point1.Y;
+        Vector2 crossPoint = new Vector2((float)crossX, (float)crossY);
+        if (IsPointOnSegment(crossX, crossY) && segment.IsPointOnSegment(crossX, crossY)) return crossPoint;
+        return null;
+    }
 
-        float b1x = this.Point2.X;
-        float b1y = this.Point2.Y;
+    // Does NOT really check whether point is on the LINE
+    // If you use this function consider that you give a point that lies on the line you get if you extend the segment
+    public bool IsPointOnSegment(double x, double y) {
+        Vector2 leftPoint = Point1.X >= Point2.X ? Point1 : Point2;
+        Vector2 rightPoint = Point1.X <= Point2.X ? Point1 : Point2;
+        Vector2 topPoint = Point1.Y <= Point2.Y ? Point1 : Point2;
+        Vector2 bottomPoint = Point1.Y >= Point2.Y ? Point1 : Point2;
 
-        float a2x = segment.Point1.X;
-        float a2y = segment.Point1.Y;
+        if ((x <= leftPoint.X || _isOproximatlyEqual(x, leftPoint.X)) &&
+            (x >= rightPoint.X || _isOproximatlyEqual(x, rightPoint.X)) &&
+            (y >= topPoint.Y || _isOproximatlyEqual(y, topPoint.Y)) &&
+            (y <= bottomPoint.Y || _isOproximatlyEqual(y, bottomPoint.Y)))
+            return true;
+        return false;
+    }
 
-        float b2x = segment.Point2.X;
-        float b2y = segment.Point2.Y;
-
-        float e1 = (b1y - a1y) / (b1x - a1x);
-        float e2 = (b2y - a2y) / (b2x - a2x);
-
-        if (e2 - e1 == 0) return null; 
-
-        float crossY = (a1y * e2 - a2y * e1 + a2x * e2 * e1 - a1x * e1 * e2) / (e2 - e1);
-        float crossX = -((a1y - a1x * e1 - crossY) / e1);
-
-        return new Vector2(crossX, crossY);
+    private bool _isOproximatlyEqual(double a, double b)
+    {
+        return Math.Abs(a - b) < 0.000001;
     }
 }
