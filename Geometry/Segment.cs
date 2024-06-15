@@ -3,7 +3,7 @@ using System;
 
 using SFML.System;
 
-namespace MyEngine;
+namespace MyEngine.Geometry;
 
 class Segment
 {

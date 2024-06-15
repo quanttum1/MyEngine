@@ -25,7 +25,7 @@ public class Window
 
     public void Run() {
         _window.KeyPressed += KeyPressedHandler;
-        IEngine engine = new Pseudo3DEngine(_window, _window);
+        IEngine engine = new Minimap(_window, _window);
 
         while (_window.IsOpen)
         {
